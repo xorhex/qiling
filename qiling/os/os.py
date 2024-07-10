@@ -60,19 +60,18 @@ class QlOs:
             # for the standard streams which usually do not support certain operations,
             # such as fileno(). here we use this to determine how we are going to use
             # the environment standard streams
-            sys.stdin.fileno()
+            #sys.stdin.fileno()
+            # Qiling is used in a script, or on an environment that supports ordinary
+            # stanard streams
+            self._stdin  = PersistentQlFile('stdin',  sys.stdin.fileno())
+            self._stdout = PersistentQlFile('stdout', sys.stdout.fileno())
+            self._stderr = PersistentQlFile('stderr', sys.stderr.fileno())
         except UnsupportedOperation:
             # Qiling is used on an interactive shell or embedded python interpreter.
             # if the internal stream buffer is accessible, we should use it
             self._stdin  = getattr(sys.stdin,  'buffer', sys.stdin)
             self._stdout = getattr(sys.stdout, 'buffer', sys.stdout)
             self._stderr = getattr(sys.stderr, 'buffer', sys.stderr)
-        else:
-            # Qiling is used in a script, or on an environment that supports ordinary
-            # stanard streams
-            self._stdin  = PersistentQlFile('stdin',  sys.stdin.fileno())
-            self._stdout = PersistentQlFile('stdout', sys.stdout.fileno())
-            self._stderr = PersistentQlFile('stderr', sys.stderr.fileno())
 
         # defult exit point
         self.exit_point = {
